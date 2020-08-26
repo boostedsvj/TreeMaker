@@ -115,6 +115,7 @@ DEFAULT_NAMED_PTR(D,ecfN3b2);
 DEFAULT_NAMED_PTR(D,neutralPuppiMultiplicity);
 DEFAULT_NAMED_PTR(D,neutralHadronPuppiMultiplicity);
 DEFAULT_NAMED_PTR(D,photonPuppiMultiplicity);
+DEFAULT_NAMED_PTR(D,msd); // softdrop mass as userfloat rather than from subjets
 
 class NamedPtr_I : public NamedPtr<int> {
 	public:
