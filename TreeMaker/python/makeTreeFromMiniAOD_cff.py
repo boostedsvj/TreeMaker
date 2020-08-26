@@ -1193,6 +1193,15 @@ def makeTreeFromMiniAOD(self,process):
         src = JetAK15Tag
     )
 
+    # alternate softdrop parameters
+    process.ak15PFJetsPuppiSoftDropBeta1 = process.ak15PFJetsPuppiSoftDrop.clone(
+        beta = cms.double(1.0),
+    )
+    process.ak15PFJetsPuppiSoftDropMassBeta1 = process.ak15PFJetsPuppiSoftDropMass.clone(
+        src = JetAK15Tag,
+        matched = cms.InputTag("ak15PFJetsPuppiSoftDropBeta1")
+    )
+
     # update userfloats (used for jet ID, including ID for JEC/JER variations)
     process, JetAK15Tag = addJetInfo(
         process, JetAK15Tag,
@@ -1202,7 +1211,8 @@ def makeTreeFromMiniAOD(self,process):
             'puppiSpecificAK15:neutralHadronPuppiMultiplicity',
             'puppiSpecificAK15:photonPuppiMultiplicity',
             'puppiSpecificAK15:HFHadronPuppiMultiplicity',
-            'puppiSpecificAK15:HFEMPuppiMultiplicity'
+            'puppiSpecificAK15:HFEMPuppiMultiplicity',
+            'ak15PFJetsPuppiSoftDropMassBeta1',
         ]
     )
 
@@ -1220,6 +1230,12 @@ def makeTreeFromMiniAOD(self,process):
     process.JetPropertiesAK15.neutralHadronPuppiMultiplicity = cms.vstring("puppiSpecificAK15:neutralHadronPuppiMultiplicity")
     process.JetPropertiesAK15.neutralPuppiMultiplicity = cms.vstring("puppiSpecificAK15:neutralPuppiMultiplicity")
     process.JetPropertiesAK15.photonPuppiMultiplicity = cms.vstring("puppiSpecificAK15:photonPuppiMultiplicity")
+
+    process.JetPropertiesAK15.properties.append("msd")
+    process.JetPropertiesAK15.msd = cms.vstring("ak15PFJetsPuppiSoftDropMassBeta1")
+    self.VectorDouble.extend([
+        'JetPropertiesAK15:msd(JetsAK15_softDropMassBeta1)'
+    ])
 
     ## ----------------------------------------------------------------------------------------------
     ## ----------------------------------------------------------------------------------------------
