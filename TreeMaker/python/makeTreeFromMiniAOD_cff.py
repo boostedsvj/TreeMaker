@@ -1148,16 +1148,16 @@ def makeTreeFromMiniAOD(self,process):
     bTagDiscriminators = [
         'pfJetProbabilityBJetTags',
         'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-        ]
+    ]
     subjetBTagDiscriminators = [
         'pfJetProbabilityBJetTags',
         'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-        ]
+    ]
     JETCorrLevels = [
         'L2Relative',
         'L3Absolute',
         'L2L3Residual'
-        ]
+    ]
 
     from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
     jetToolbox(process,
@@ -1182,7 +1182,7 @@ def makeTreeFromMiniAOD(self,process):
         subJETCorrPayload = 'AK4PFPuppi',
         JETCorrLevels = JETCorrLevels,
         subJETCorrLevels = JETCorrLevels,
-        )
+    )
 
     JetAK15Tag = cms.InputTag("packedPatJetsAK15PFPuppiSoftDrop")
     subJetAK15Tag = cms.InputTag("selectedPatJetsAK15PFPuppiSoftDropPacked:SubJets")
@@ -1191,7 +1191,7 @@ def makeTreeFromMiniAOD(self,process):
     from PhysicsTools.PatAlgos.patPuppiJetSpecificProducer_cfi import patPuppiJetSpecificProducer
     process.puppiSpecificAK15 = patPuppiJetSpecificProducer.clone(
         src = JetAK15Tag
-        )
+    )
 
     # update userfloats (used for jet ID, including ID for JEC/JER variations)
     process, JetAK15Tag = addJetInfo(
@@ -1203,8 +1203,8 @@ def makeTreeFromMiniAOD(self,process):
             'puppiSpecificAK15:photonPuppiMultiplicity',
             'puppiSpecificAK15:HFHadronPuppiMultiplicity',
             'puppiSpecificAK15:HFEMPuppiMultiplicity'
-            ]
-        )
+        ]
+    )
 
     process = self.makeJetVarsAK8(
         process,
@@ -1213,9 +1213,9 @@ def makeTreeFromMiniAOD(self,process):
         storeProperties=2,
         puppiSpecific = 'puppiSpecificAK15',
         subjetTag = 'SoftDrop',
-	doECFs = True,
+        doECFs = True,
         isAK15 = True
-        )
+    )
 
     process.JetPropertiesAK15.neutralHadronPuppiMultiplicity = cms.vstring("puppiSpecificAK15:neutralHadronPuppiMultiplicity")
     process.JetPropertiesAK15.neutralPuppiMultiplicity = cms.vstring("puppiSpecificAK15:neutralPuppiMultiplicity")
