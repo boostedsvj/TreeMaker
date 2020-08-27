@@ -18,6 +18,7 @@
 class VertexInfos {
 public:
 	VertexInfos() {
+		vtx_ref      = std::make_unique<std::vector<reco::VertexRef>>();
 		vtx_position = std::make_unique<std::vector<math::XYZPoint>>();
 		vtx_time     = std::make_unique<std::vector<double>>();
 		vtx_isValid  = std::make_unique<std::vector<bool>>();
@@ -45,10 +46,14 @@ public:
 		vtx_zError->push_back(vertex.zError());
 		vtx_tError->push_back(vertex.tError());
 		vtx_ntracks->push_back(vertex.nTracks());
+	}
 
+	void fillRef(const edm::Handle<reco::VertexCollection> & vertices, const size_t & i) {
+		vtx_ref->push_back(reco::VertexRef(vertices, i));
 	}
 
 	void put(edm::Event & iEvent) {
+		iEvent.put(std::move(vtx_ref),      "vtxref");
 		iEvent.put(std::move(vtx_position), "vtxposition");
 		iEvent.put(std::move(vtx_time),     "vtxtime");
 		iEvent.put(std::move(vtx_isValid),  "vtxisValid");
@@ -64,6 +69,7 @@ public:
 	}
 
 // ----------member data ---------------------------
+	std::unique_ptr<std::vector<reco::VertexRef>> vtx_ref;
 	std::unique_ptr<std::vector<math::XYZPoint>> vtx_position;
 	std::unique_ptr<std::vector<bool>> vtx_isValid, vtx_isFake, vtx_isGood;
 	std::unique_ptr<std::vector<double>> vtx_time, vtx_ndof, vtx_chi2, vtx_xError, vtx_yError, vtx_zError, vtx_tError;
@@ -99,6 +105,7 @@ saveVertices_(iConfig.getParameter<bool>("saveVertices"))
 	produces<int>("NVtx");
 	produces<int>("nAllVertices");
 	if (saveVertices_) {
+		produces<std::vector<reco::VertexRef> >("vtxref");
 		produces<std::vector<math::XYZPoint> > ("vtxposition");
 		produces<std::vector<double> >         ("vtxtime");
 		produces<std::vector<bool> >           ("vtxisValid");
@@ -160,6 +167,7 @@ PrimaryVerticesProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::E
 				} );
 
 			infos.fill(vertex,it!=goodVertices->end());
+			infos.fillRef(vertices,i);
 		}
 		infos.put(iEvent);
 	}

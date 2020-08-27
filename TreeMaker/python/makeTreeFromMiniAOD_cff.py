@@ -32,31 +32,39 @@ def makeTreeFromMiniAOD(self,process):
     # configure treemaker
     from TreeMaker.TreeMaker.treeMaker import TreeMaker
     process.TreeMaker2 = TreeMaker.clone(
-        TreeName                  = cms.string(self.treename),
-        VectorRecoCand            = self.VectorRecoCand,
-        VarsXYZVector             = self.VarsXYZVector,
-        VarsXYZPoint              = self.VarsXYZPoint,
-        VarsDouble                = self.VarsDouble,
-        VarsInt                   = self.VarsInt,
-        VarsBool                  = self.VarsBool,
-        VectorLorentzVector       = self.VectorLorentzVector,
-        VectorXYZVector           = self.VectorXYZVector,
-        VectorXYZPoint            = self.VectorXYZPoint,
-        VectorFloat               = self.VectorFloat,
-        VectorDouble              = self.VectorDouble,
-        VectorInt                 = self.VectorInt,
-        VectorString              = self.VectorString,
-        VectorBool                = self.VectorBool,
-        VectorVectorBool          = self.VectorVectorBool,
-        VectorVectorInt           = self.VectorVectorInt,
-        VectorVectorDouble        = self.VectorVectorDouble,
-        VectorVectorString        = self.VectorVectorString,
-        VectorVectorLorentzVector = self.VectorVectorLorentzVector,
-        VectorVectorXYZVector     = self.VectorVectorXYZVector,
-        VectorVectorXYZPoint      = self.VectorVectorXYZVector,
-        TitleMap                  = self.TitleMap,
-        nestedVectors             = self.nestedVectors,
-        splitLevel                = self.splitLevel,
+        TreeName                       = cms.string(self.treename),
+        VectorRecoCand                 = self.VectorRecoCand,
+        VarsXYZVector                  = self.VarsXYZVector,
+        VarsXYZPoint                   = self.VarsXYZPoint,
+        VarsDouble                     = self.VarsDouble,
+        VarsInt                        = self.VarsInt,
+        VarsBool                       = self.VarsBool,
+        VectorLorentzVector            = self.VectorLorentzVector,
+        VectorXYZVector                = self.VectorXYZVector,
+        VectorXYZPoint                 = self.VectorXYZPoint,
+        VectorFloat                    = self.VectorFloat,
+        VectorDouble                   = self.VectorDouble,
+        VectorInt                      = self.VectorInt,
+        VectorString                   = self.VectorString,
+        VectorBool                     = self.VectorBool,
+        VectorVectorBool               = self.VectorVectorBool,
+        VectorVectorInt                = self.VectorVectorInt,
+        VectorVectorDouble             = self.VectorVectorDouble,
+        VectorVectorString             = self.VectorVectorString,
+        VectorVectorLorentzVector      = self.VectorVectorLorentzVector,
+        VectorVectorXYZVector          = self.VectorVectorXYZVector,
+        VectorVectorXYZPoint           = self.VectorVectorXYZVector,
+        AssocVectorVectorBool          = self.AssocVectorVectorBool,
+        AssocVectorVectorInt           = self.AssocVectorVectorInt,
+        AssocVectorVectorDouble        = self.AssocVectorVectorDouble,
+        AssocVectorVectorString        = self.AssocVectorVectorString,
+        AssocVectorVectorLorentzVector = self.AssocVectorVectorLorentzVector,
+        AssocVectorVectorXYZVector     = self.AssocVectorVectorXYZVector,
+        AssocVectorVectorXYZPoint      = self.AssocVectorVectorXYZVector,
+        TitleMap                       = self.TitleMap,
+        nestedVectors                  = self.nestedVectors,
+        storeOffsets                   = self.storeOffsets,
+        splitLevel                     = self.splitLevel,
     )
 
     ## ----------------------------------------------------------------------------------------------
@@ -161,6 +169,7 @@ def makeTreeFromMiniAOD(self,process):
                 keepIds = cms.vint32(),
                 keepFirst = cms.bool(False),
                 keepMinimal = cms.bool(True),
+                saveVtx = cms.bool(self.emerging),
             )
         else:
             process.genParticles = cms.EDProducer("GenParticlesProducer",
@@ -178,16 +187,21 @@ def makeTreeFromMiniAOD(self,process):
                 keepIds = cms.vint32(6,23,24,25),
                 keepFirst = cms.bool(True),
                 keepMinimal = cms.bool(False),
+                saveVtx = cms.bool(self.emerging),
             )
             # store gluons for signals with Higgs
             if "T5qqqqZH" in process.source.fileNames[0]: process.genParticles.childIds.append(21)
         self.VectorLorentzVector.append("genParticles(GenParticles)")
+        self.VectorInt.append("genParticles:Charge(GenParticles_Charge)")
         self.VectorInt.append("genParticles:PdgId(GenParticles_PdgId)")
         self.VectorInt.append("genParticles:Status(GenParticles_Status)")
         self.VectorInt.append("genParticles:Parent(GenParticles_ParentIdx)")
         self.VectorInt.append("genParticles:ParentId(GenParticles_ParentId)")
         if not self.saveMinimalGenParticles:
             self.VectorBool.append("genParticles:TTFlag(GenParticles_TTFlag)")
+        if self.emerging:
+            self.VectorInt.append("genParticles:VtxIdx(GenParticles_vertexIdx)")
+            self.VectorXYZPoint.append("genParticles:GenVtx(GenVertices)")
         
         if self.saveGenTops:
             # for ttbar pT reweighting
@@ -1099,6 +1113,7 @@ def makeTreeFromMiniAOD(self,process):
         from TreeMaker.Utils.candidateTrackMaker_cfi import candidateTrackFilter
         process.trackFilter = candidateTrackFilter.clone(
             vertexInputTag    = cms.InputTag("goodVertices"),
+            storedVerticesTag = cms.InputTag("primaryVertices","vtxref"),
             pfCandidatesTag   = cms.InputTag("packedPFCandidates"),
             lostTracksTag     = cms.InputTag("lostTracks"),
             lostEleTracksTag  = cms.InputTag("lostTracks","eleTracks"),
@@ -1124,6 +1139,7 @@ def makeTreeFromMiniAOD(self,process):
             'trackFilter:trksip3d(Tracks_IP3DPV0)',
             'trackFilter:trksip3dsig(Tracks_IP3DSigPV0)',
             'trackFilter:pfcandsdzassociatedpv(Tracks_dzAssociatedPV)',
+            'trackFilter:vtxsumtrackpt2(PrimaryVertices_sumTrackPt2)'
         ])
         self.VectorInt.extend([
             'trackFilter:trkschg(Tracks_charge)',
@@ -1135,6 +1151,7 @@ def makeTreeFromMiniAOD(self,process):
             'trackFilter:pfcandsfirsthit(Tracks_firstHit)',
             'trackFilter:pfcandsfrompv(Tracks_fromPV0)',
             'trackFilter:pfcandspvassociationquality(Tracks_pvAssociationQuality)',
+            'trackFilter:pfcandsvtxidx(Tracks_vertexIdx)',
         ])
         self.VectorVectorInt.extend([
             'trackFilter:trkshitpattern(Tracks_hitPattern)',
